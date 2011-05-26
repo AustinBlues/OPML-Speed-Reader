@@ -1,0 +1,11 @@
+<opml version="1.0">
+  <head>
+    <title>Forumzilla OPML Export</title>
+    <dateCreated>Fri, 06 Nov 2009 00:18:02 GMT</dateCreated>
+  </head>
+  <body>
+    <outline text="Distributing the Future" xmlUrl="test/opml/DistributingTheFuture.xml"/>
+    <outline text="Forums: Message List - Developer Tools" xmlUrl="test/opml/AmazonDeveloperTools.xml"/>
+    <outline text="The Roadhouse" xmlUrl="test/opml/TheRoadhouse.xml"/>
+  </body>
+</opml>
