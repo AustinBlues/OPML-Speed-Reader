@@ -1,4 +1,3 @@
-#require 'libxml-ruby'
 require 'xml'
 require 'opml_speed_reader/version'
 
