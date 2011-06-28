@@ -90,4 +90,21 @@ module OpmlSpeedReader
       end
     end while reader.read
   end
+
+  # Parse OPML, reading XML from +io+, returning hash with all RSS
+  # feed relevant data.
+  def self.parse(io)
+    reader = XML::Reader.io(io)
+    stack = []
+    title = OpmlSpeedReader.parse_header(reader, stack)
+
+    stack.pop
+
+    feeds = []
+    OpmlSpeedReader.parse_body(reader, stack) do |feed|
+      feeds << feed
+    end
+
+    {:title => title, :feeds => feeds}
+  end
 end
