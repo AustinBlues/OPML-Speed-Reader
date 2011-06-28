@@ -3,9 +3,22 @@ require 'opml_speed_reader/version'
 
 
 module OpmlSpeedReader
-  #TRACE = [:all_elements]
+#  TRACE = [:all_elements]
   TRACE = []
 
+  # Trace parse - for use by developers; expects block with debug string to print
+  # <tt>element</tt>: type of element
+  def OpmlSpeedReader.trace(element)
+    if OpmlSpeedReader::TRACE.include?(:all_elements) ||
+	OpmlSpeedReader::TRACE.include?(element)
+      puts yield
+    end
+  end
+
+
+  # Parse header of OPML file
+  # <tt>reader</tt> - +XML::Reader+ object to read from
+  # <tt>stack</tt> - parse stack, initially empty
   def OpmlSpeedReader.parse_header(reader, stack)
     title = nil
 
@@ -52,6 +65,10 @@ module OpmlSpeedReader
   end
 
 
+
+  # Parse OPML file for RSS/Atom feeds
+  # <tt>reader</tt>: +XML::Reader+ object to read from
+  # <tt>stack</tt>: parse stack from parse_header()
   def self.parse_body(reader, stack)
     libxml = {}		# force scope
     begin	# post test loop
@@ -59,51 +76,59 @@ module OpmlSpeedReader
       when XML::Reader::TYPE_ELEMENT
 	stack << reader.name
 	path = stack.join('/')
-	ignore = false
 	case path
 	when %r|opml/body(/outline)+|
-	  libxml['title'] = reader['text'].strip
+	  libxml['title'] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
 	  libxml['url'] = reader['xmlUrl'].strip if reader['xmlUrl']
-	  if reader.empty_element? && libxml['url']
-	    yield libxml
-	    libxml = {}
+	  OpmlSpeedReader.trace(:essential_elements) do
+	    "BEGIN(#{path}): '#{libxml['title']}' '#{libxml['url']}' #{stack.size-3}."
 	  end
-	else
-	  ignore = true  
-	end
-	if (OpmlSpeedReader::TRACE.include?(:essential_elements) && !ignore) ||
-	    OpmlSpeedReader::TRACE.include?(:all_elements)
-	  puts "BEGIN(#{path}): '#{libxml['title']}' '#{libxml['url']}'."
+	  yield(libxml.dup, stack.size - 3) unless libxml.empty?
 	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_END_ELEMENT
 	path = stack.join('/')
 	case path
 	when %r|opml/body(/outline)+|
-	    if libxml['url']
-	      yield libxml
-	      libxml = {}
-	    end
+	  libxml = {}
 	end
 	stack.pop
       end
     end while reader.read
   end
 
+
   # Parse OPML, reading XML from +io+, returning hash with all RSS
   # feed relevant data.
   def self.parse(io)
     reader = XML::Reader.io(io)
-    stack = []
-    title = OpmlSpeedReader.parse_header(reader, stack)
+    parser_stack = []
+    title = OpmlSpeedReader.parse_header(reader, parser_stack)
 
-    stack.pop
+    parser_stack.pop
 
-    feeds = []
-    OpmlSpeedReader.parse_body(reader, stack) do |feed|
-      feeds << feed
+    feed_stack = [[]]
+    OpmlSpeedReader.parse_body(reader, parser_stack) do |feed, depth|
+      case (depth+1) <=> (feed_stack.size)
+      when +1:
+	  feed_stack << [feed]
+      when 0:
+	  feed_stack[-1] << feed
+      when -1:
+	tmp = feed_stack.pop
+	feed_stack[-1][0]['feeds'] = tmp
+	feed_stack[-1] << feed
+      else
+	raise
+      end
     end
 
-    {:title => title, :feeds => feeds}
+    # flatten stack
+    while feed_stack.size > 1
+      tmp = feed_stack.pop
+      feed_stack[-1][-1]['feeds'] = tmp
+    end
+
+    {:title => title, :feeds => feed_stack[0]}
   end
 end
