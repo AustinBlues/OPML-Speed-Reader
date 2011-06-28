@@ -1,9 +1,9 @@
 ---
 title: ourFavoriteFeedsData.top100
-:items:
-- :title: Scripting News
-  :url: "test/opml/ScriptingNews.xml"
-- :title: Wired News
-  :url: "test/opml/WiredNews.xml"
-- :title: Boing Boing Blog
-  :url: "test/opml/BoingBoing.xml"
+:feeds:
+- title: Scripting News
+  url: "test/opml/ScriptingNews.xml"
+- title: Wired News
+  url: "test/opml/WiredNews.xml"
+- title: Boing Boing Blog
+  url: "test/opml/BoingBoing.xml"

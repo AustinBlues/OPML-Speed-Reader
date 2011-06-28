@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<opml version="1.0">
+    <head>
+        <title>Lars subscriptions in Google Reader</title>
+    </head>
+    <body>
+        <outline title="@Bibliotek" text="@Bibliotek">
+            <outline text="24 Ways" title="24 Ways"
+                type="rss"
+                xmlUrl="24ways.xml" htmlUrl="http://24ways.org/"/>
+            <outline text="Jeff's Austin Blues" title="Jeff's Austin Blues" type="rss"
+                xmlUrl="austinblues.xml" htmlUrl="http://austinblues.dyndns.org/"/>
+            <outline text="Christian Century Blogs"
+                title="Christian Century Blogs" type="rss"
+                xmlUrl="CCBlog1.xml" htmlUrl="http://ccblogs.org/"/>
+            <outline text="El País" title="El País" type="rss"
+                xmlUrl="ElPais.xml" htmlUrl="http://www.elpais.com"/>
+            <outline text="Geeknet :: Blog"
+                title="Geeknet :: Blog" type="rss"
+                xmlUrl="GeekNet.xml" htmlUrl="http://blog.geek.net"/>
+            <outline text="The Guardian World News" title="The Guardian World News" type="rss"
+                xmlUrl="Guardian.xml" htmlUrl="http://www.guardian.co.uk"/>
+            <outline text="Haaretz.com - News" title="Haaretz.com - News"
+                type="rss"
+                xmlUrl="Haaretz.xml" htmlUrl="http://www.haaretz.com/"/>
+        </outline>
+        <outline title="@Politics" text="@Politics">
+            <outline
+                text="Jeff Patton&apos;s Holistic Product Design &amp; Development"
+                title="Jeff Patton&apos;s Holistic Product Design &amp; Development"
+                type="rss"
+                xmlUrl="JeffPatton.xml" htmlUrl="http://www.agileproductdesign.com/blog"/>
+            <outline text="Jon Udell" title="Jon Udell" type="rss"
+                xmlUrl="JonsNewRadio.xml" htmlUrl="http://blog.jonudell.net"/>
+            <outline text="Linux Magazine Full Feed" title="Linux Magazine Full Feed" type="rss"
+                xmlUrl="LinuxMag.xml" htmlUrl="http://www.linux-magazine.com"/>
+        </outline>
+    </body>
+</opml>
