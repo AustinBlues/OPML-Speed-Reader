@@ -1,27 +1,23 @@
 --- 
 :title: Lars subscriptions in Google Reader
 :feeds: 
-- title: @Bibliotek
-  feeds:
-  - title: 24 Ways
-    url: 24ways.xml
-  - title: Jeff's Austin Blues
-    url: austinblues.xml
-  - title: Christian Century Blogs
-    url: CCBlog1.xml
-  - title: El País
-    url: ElPais.xml
-  - title: 'Geeknet :: Blog'
-    url: GeekNet.xml
-  - title: The Guardian World News
-    url: Guardian.xml
-  - title: Haaretz.com - News
-    url: Haaretz.xml
-- title: @Politics
-  feeds: 
-  - title: Jeff Patton's Holistic Product Design & Development
-    url: JeffPatton.xml
-  - title: Jon Udell
-    url: JonsNewRadio.xml
-  - title: Linux Magazine Full Feed
-    url: LinuxMag.xml
+- title: 24 Ways
+  url: 24ways.xml
+- title: Jeff's Austin Blues
+  url: austinblues.xml
+- title: Christian Century Blogs
+  url: CCBlog1.xml
+- title: El País
+  url: ElPais.xml
+- title: 'Geeknet :: Blog'
+  url: GeekNet.xml
+- title: The Guardian World News
+  url: Guardian.xml
+- title: Haaretz.com - News
+  url: Haaretz.xml
+- title: Jeff Patton's Holistic Product Design & Development
+  url: JeffPatton.xml
+- title: Jon Udell
+  url: JonsNewRadio.xml
+- title: Linux Magazine Full Feed
+  url: LinuxMag.xml
