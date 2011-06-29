@@ -63,8 +63,8 @@ module OpmlSpeedReader
 	case path
 	when %r|opml/body(/outline)+|
 	  libxml['title'] = reader['text'].strip
-	  libxml['url'] = reader['xmlUrl'].strip if reader['xmlUrl']
-	  if reader.empty_element? && libxml['url']
+	  libxml['feed_url'] = reader['xmlUrl'].strip if reader['xmlUrl']
+	  if reader.empty_element? && libxml['feed_url']
 	    yield libxml
 	    libxml = {}
 	  end
@@ -73,14 +73,14 @@ module OpmlSpeedReader
 	end
 	if (OpmlSpeedReader::TRACE.include?(:essential_elements) && !ignore) ||
 	    OpmlSpeedReader::TRACE.include?(:all_elements)
-	  puts "BEGIN(#{path}): '#{libxml['title']}' '#{libxml['url']}'."
+	  puts "BEGIN(#{path}): '#{libxml['title']}' '#{libxml['feed_url']}'."
 	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_END_ELEMENT
 	path = stack.join('/')
 	case path
 	when %r|opml/body(/outline)+|
-	    if libxml['url']
+	    if libxml['feed_url']
 	      yield libxml
 	      libxml = {}
 	    end
@@ -99,11 +99,11 @@ module OpmlSpeedReader
 
     stack.pop
 
-    feeds = []
+    feeds = [title]
     OpmlSpeedReader.parse_body(reader, stack) do |feed|
       feeds << feed
     end
 
-    {:title => title, :feeds => feeds}
+    feeds
   end
 end

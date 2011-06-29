@@ -1,9 +1,8 @@
----
-:title: Forumzilla OPML Export
-:feeds:
+--- 
+- Forumzilla OPML Export
 - title: Distributing the Future
-  url: "test/opml/DistributingTheFuture.xml"
-- title: 'Forums: Message List - Developer Tools'
-  url: "test/opml/AmazonDeveloperTools.xml"
+  feed_url: test/opml/DistributingTheFuture.xml
+- title: "Forums: Message List - Developer Tools"
+  feed_url: test/opml/AmazonDeveloperTools.xml
 - title: The Roadhouse
-  url: "test/opml/TheRoadhouse.xml"
+  feed_url: test/opml/TheRoadhouse.xml
