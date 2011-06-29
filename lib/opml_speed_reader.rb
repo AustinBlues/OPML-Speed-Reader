@@ -79,9 +79,9 @@ module OpmlSpeedReader
 	case path
 	when %r|opml/body(/outline)+|
 	  libxml['title'] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
-	  libxml['url'] = reader['xmlUrl'].strip if reader['xmlUrl']
+	  libxml['feed_url'] = reader['xmlUrl'].strip if reader['xmlUrl']
 	  OpmlSpeedReader.trace(:essential_elements) do
-	    "BEGIN(#{path}): '#{libxml['title']}' '#{libxml['url']}' #{stack.size-3}."
+	    "BEGIN(#{path}): '#{libxml['title']}' '#{libxml['feed_url']}' #{stack.size-3}."
 	  end
 	  yield(libxml.dup, stack.size - 3) unless libxml.empty?
 	end
@@ -107,28 +107,36 @@ module OpmlSpeedReader
 
     parser_stack.pop
 
-    feed_stack = [[]]
+    feed_stack = [[title]]
     OpmlSpeedReader.parse_body(reader, parser_stack) do |feed, depth|
-      case (depth+1) <=> (feed_stack.size)
-      when +1:
-	  feed_stack << [feed]
-      when 0:
-	  feed_stack[-1] << feed
-      when -1:
-	tmp = feed_stack.pop
-	feed_stack[-1][0]['feeds'] = tmp
+#      puts "STACK: #{feed_stack.inspect}."
+#      puts "F(#{(depth+1) <=> (feed_stack.size)}): #{depth} #{feed.inspect}."
+      if feed.size > 1
+	raise if ((depth+1) <=> (feed_stack.size)) == -1
 	feed_stack[-1] << feed
       else
-	raise
+	case ((depth+1) <=> (feed_stack.size))
+	when +1: raise
+	when 0: feed_stack << [feed['title']]
+	when -1:
+	    tmp = feed_stack.pop
+	  feed_stack[-1] << tmp
+	  feed_stack << [feed['title']]
+	else
+	  raise
+	end
       end
     end
 
     # flatten stack
     while feed_stack.size > 1
+#      puts "STACK: #{feed_stack.inspect}."
       tmp = feed_stack.pop
-      feed_stack[-1][-1]['feeds'] = tmp
+      feed_stack[-1] << tmp
     end
 
-    {:title => title, :feeds => feed_stack[0]}
+#    puts "STACK: #{feed_stack.inspect}."
+    
+    feed_stack[0]
   end
 end
