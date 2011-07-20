@@ -3,6 +3,8 @@ require 'opml_speed_reader/version'
 
 
 module OpmlSpeedReader
+  class NotOPML < StandardError; end
+
 #  TRACE = [:all_elements]
   TRACE = []
 
@@ -24,9 +26,11 @@ module OpmlSpeedReader
 
     begin
       status = reader.read
-    rescue
-      return title
-    end
+    rescue LibXML::XML::Error
+      raise NotOPML
+    end while status && reader.node_type == XML::Reader::TYPE_COMMENT
+
+    raise NotOPML unless !status || (reader.node_type == XML::Reader::TYPE_ELEMENT && reader.name == 'opml')
 
     while status
       case reader.node_type

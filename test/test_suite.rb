@@ -18,4 +18,12 @@ class TestOpml < Test::Unit::TestCase
       assert opml == expected
     end
   end
+
+
+  def test_not_opml
+    io = open('./test/opml/not_opml.html')
+    assert_raise OpmlSpeedReader::NotOPML do
+      OpmlSpeedReader.parse(io)
+    end
+  end
 end
