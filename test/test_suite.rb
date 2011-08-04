@@ -6,21 +6,21 @@ require 'opml_speed_reader'
 
 
 class TestOpml < Test::Unit::TestCase
+  # Compare output for OPML files against expected (YAML test fixtures)
   def test_parsing
     Dir['./test/opml/*.yml'].each do |filename|
-#      puts "FILE: #{filename}."
       expected = YAML::load( File.open( filename ) )
-#      puts "EXPECTD: #{expected.inspect}."
-      io = open(filename.gsub(/\.yml\Z/, '.xml'))
-      opml = OpmlSpeedReader.parse(io)
-#      puts "ACTUAL:  #{opml.inspect}."
-#      puts "ACTUAL:  #{opml.to_yaml}."
-      assert opml == expected
+      opml = OpmlSpeedReader.parse(open(filename.gsub(/\.yml\Z/, '.xml')))
+      assert (opml == expected)
     end
   end
 
 
+  # Test exception thrown for non-OPML file (it's an HTML file, a
+  # common user mistake.
   def test_not_opml
+    # Disable noisy error reporting by libxml2 library on STDOUT
+    XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
     io = open('./test/opml/not_opml.html')
     assert_raise OpmlSpeedReader::NotOPML do
       OpmlSpeedReader.parse(io)

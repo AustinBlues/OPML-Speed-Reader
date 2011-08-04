@@ -8,7 +8,7 @@ Fast OPML parser for importing RSS feeds.
 
 - [Examples](http://github.com/AustinBlues/OPML-Speed-Reader/tree/masterexamples)
     cd examples
-    bundle exec ruby opml_to_yaml.rb < XYZ.xml
+    bundle exec ruby opml_to_yaml.rb < ../test/opml/Google.xml
 
 ## Dependencies
 
