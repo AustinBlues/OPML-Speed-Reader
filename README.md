@@ -13,7 +13,10 @@ Fast OPML parser for importing RSS feeds.
 - libxml-ruby - Gem
 - libxml2 and libxml2-dev - GNOME library to manipulate XML files
 
-## Branches
+## Testing
+	bundle exec test/test_suite.rb
+
+## Branches (FLAT branch not pushed to GitHub yet)
 - master - retains hierarchy/nesting in OPML file
 - FLAT - flattens hierarchy, i.e., discards/ignores nesting.
 
