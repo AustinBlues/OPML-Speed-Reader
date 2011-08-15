@@ -16,7 +16,8 @@ class TestOpml < Test::Unit::TestCase
   def test_parsing
     Dir['./test/opml/*.yml'].each do |filename|
       expected = YAML::load( File.open( filename ) )
-      opml = OpmlSpeedReader.parse(open(filename.gsub(/\.yml\Z/, '.xml')))
+      reader = XML::Reader.io(open(filename.gsub(/\.yml\Z/, '.xml')))
+      opml = OpmlSpeedReader.parse(reader)
       assert (opml == expected)
     end
   end
@@ -25,9 +26,9 @@ class TestOpml < Test::Unit::TestCase
   # Test exception thrown for non-OPML file (it's an HTML file, a
   # common user mistake.
   def test_not_opml
-    io = open('./test/opml/not_opml.html')
+    reader = XML::Reader.io(open('./test/opml/not_opml.html'))
     assert_raise OpmlSpeedReader::NotOPML do
-      OpmlSpeedReader.parse(io)
+      OpmlSpeedReader.parse(reader)
     end
   end
 end

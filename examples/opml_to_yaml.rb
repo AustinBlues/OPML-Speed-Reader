@@ -7,7 +7,8 @@ require 'yaml'
 XML::Error.set_handler(&XML::Error::QUIET_HANDLER)
 
 begin
-  puts OpmlSpeedReader.parse(STDIN).to_yaml
+  reader = XML::Reader.io(STDIN)
+  puts OpmlSpeedReader.parse(reader).to_yaml
 rescue OpmlSpeedReader::NotOPML
   STDERR.puts "Not OPML"
   exit 1

@@ -104,8 +104,7 @@ module OpmlSpeedReader
 
   # Parse OPML, reading XML from +io+, returning hash with all RSS
   # feed relevant data.
-  def self.parse(io)
-    reader = XML::Reader.io(io)
+  def self.parse(reader)
     parser_stack = []
     title = OpmlSpeedReader.parse_header(reader, parser_stack)
 
