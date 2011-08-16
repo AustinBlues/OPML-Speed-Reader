@@ -102,6 +102,17 @@ module OpmlSpeedReader
   end
 
 
+  # Is source in reader in OPML format?
+  def self.opml?(reader)
+    parser_stack = []
+    title = OpmlSpeedReader.parse_header(reader, parser_stack)
+  rescue OpmlSpeedReader::NotOPML
+    false
+  else
+    true
+  end
+
+
   # Parse OPML, reading XML from +io+, returning hash with all RSS
   # feed relevant data.
   def self.parse(reader)
@@ -112,17 +123,17 @@ module OpmlSpeedReader
 
     feed_stack = [[title]]
     OpmlSpeedReader.parse_body(reader, parser_stack) do |feed, depth|
-#      puts "STACK: #{feed_stack.inspect}."
-#      puts "F(#{(depth+1) <=> (feed_stack.size)}): #{depth} #{feed.inspect}."
       if feed.size > 1
 	raise if ((depth+1) <=> (feed_stack.size)) == -1
 	feed_stack[-1] << feed
       else
-	case ((depth+1) <=> (feed_stack.size))
-	when +1: raise
-	when 0: feed_stack << [feed['title']]
+	case depth+1 <=> feed_stack.size
+	when +1:
+	  raise
+	when 0:
+	  feed_stack << [feed['title']]
 	when -1:
-	    tmp = feed_stack.pop
+	  tmp = feed_stack.pop
 	  feed_stack[-1] << tmp
 	  feed_stack << [feed['title']]
 	else
@@ -131,15 +142,12 @@ module OpmlSpeedReader
       end
     end
 
-    # flatten stack
+    # Nested feeds (e.g. Google categories) need final flattening.
     while feed_stack.size > 1
-#      puts "STACK: #{feed_stack.inspect}."
       tmp = feed_stack.pop
       feed_stack[-1] << tmp
     end
 
-#    puts "STACK: #{feed_stack.inspect}."
-    
     feed_stack[0]
   end
 end

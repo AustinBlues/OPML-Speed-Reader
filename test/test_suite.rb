@@ -31,4 +31,21 @@ class TestOpml < Test::Unit::TestCase
       OpmlSpeedReader.parse(reader)
     end
   end
+
+
+  # All OPML file in test fixtures with YAML files are real OPML.
+  def test_opml_detection
+    Dir['./test/opml/*.yml'].each do |filename|
+      reader = XML::Reader.io(open(filename.gsub(/\.yml\Z/, '.xml')))
+      assert (OpmlSpeedReader.opml?(reader))
+    end
+  end
+
+
+  # Test exception thrown for non-OPML file (it's an HTML file, a
+  # common user mistake.
+  def test_not_opml_detection
+    reader = XML::Reader.io(open('./test/opml/not_opml.html'))
+    assert (!OpmlSpeedReader.opml?(reader))
+  end
 end
