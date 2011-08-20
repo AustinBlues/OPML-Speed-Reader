@@ -1,8 +1,8 @@
 --- 
 - ourFavoriteFeedsData.top100
-- title: Scripting News
-  feed_url: test/opml/ScriptingNews.xml
-- title: Wired News
-  feed_url: test/opml/WiredNews.xml
-- title: Boing Boing Blog
-  feed_url: test/opml/BoingBoing.xml
+- :title: Scripting News
+  :url: test/opml/ScriptingNews.xml
+- :title: Wired News
+  :url: test/opml/WiredNews.xml
+- :title: Boing Boing Blog
+  :url: test/opml/BoingBoing.xml

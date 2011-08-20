@@ -27,10 +27,12 @@ module OpmlSpeedReader
     begin
       status = reader.read
     rescue LibXML::XML::Error
-      raise NotOPML
-    end while status && reader.node_type == XML::Reader::TYPE_COMMENT
+      raise NotOPML, 'Not XML'
+    else
+      raise NotOPML, 'Empty file' if !status	# EOF
+    end while reader.node_type == XML::Reader::TYPE_COMMENT
 
-    raise NotOPML unless !status || (reader.node_type == XML::Reader::TYPE_ELEMENT && reader.name == 'opml')
+    raise NotOPML, reader.name if reader.node_type == XML::Reader::TYPE_ELEMENT && reader.name != 'opml'
 
     while status
       case reader.node_type
@@ -74,7 +76,7 @@ module OpmlSpeedReader
   # <tt>reader</tt>: +XML::Reader+ object to read from
   # <tt>stack</tt>: parse stack from parse_header()
   def self.parse_body(reader, stack)
-    libxml = {}		# force scope
+    feed = {}		# force scope
     begin	# post test loop
       case reader.node_type
       when XML::Reader::TYPE_ELEMENT
@@ -82,19 +84,19 @@ module OpmlSpeedReader
 	path = stack.join('/')
 	case path
 	when %r|opml/body(/outline)+|
-	  libxml['title'] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
-	  libxml['feed_url'] = reader['xmlUrl'].strip if reader['xmlUrl']
+	  feed[:title] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
+	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
 	  OpmlSpeedReader.trace(:essential_elements) do
-	    "BEGIN(#{path}): '#{libxml['title']}' '#{libxml['feed_url']}' #{stack.size-3}."
+	    "BEGIN(#{path}): '#{feed[:title]}' '#{feed[:url]}' #{stack.size-3}."
 	  end
-	  yield(libxml.dup, stack.size - 3) unless libxml.empty?
+	  yield(feed.dup, stack.size - 3) unless feed.empty?
 	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_END_ELEMENT
 	path = stack.join('/')
 	case path
 	when %r|opml/body(/outline)+|
-	  libxml = {}
+	  feed = {}
 	end
 	stack.pop
       end
@@ -131,11 +133,11 @@ module OpmlSpeedReader
 	when +1
 	  raise
 	when 0
-	  feed_stack << [feed['title']]
+	  feed_stack << [feed[:title]]
 	when -1
 	  tmp = feed_stack.pop
 	  feed_stack[-1] << tmp
-	  feed_stack << [feed['title']]
+	  feed_stack << [feed[:title]]
 	else
 	  raise
 	end
