@@ -128,11 +128,11 @@ module OpmlSpeedReader
 	feed_stack[-1] << feed
       else
 	case depth+1 <=> feed_stack.size
-	when +1:
+	when +1
 	  raise
-	when 0:
+	when 0
 	  feed_stack << [feed['title']]
-	when -1:
+	when -1
 	  tmp = feed_stack.pop
 	  feed_stack[-1] << tmp
 	  feed_stack << [feed['title']]
