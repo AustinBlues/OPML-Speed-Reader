@@ -10,10 +10,10 @@ class TestOpml < Test::Unit::TestCase
     Dir['./test/opml/*.yml'].each do |filename|
 #      puts "FILE: #{filename}."
       expected = YAML::load( File.open( filename ) )
-#      puts "EXPECTD: #{expected.inspect}."
       io = open(filename.gsub(/\.yml\Z/, '.xml'))
-      opml = OpmlSpeedReader.parse(io)
-#      puts "ACTUAL:  #{opml.inspect}."
+      reader = XML::Reader.io(io)
+      opml = OpmlSpeedReader.parse(reader)
+#      puts "EXPECTED: #{expected.to_yaml}."
 #      puts "ACTUAL:  #{opml.to_yaml}."
       assert opml == expected
     end

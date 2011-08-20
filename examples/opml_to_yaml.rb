@@ -3,4 +3,5 @@ require '../lib/opml_speed_reader'
 require 'yaml'
 
 
-puts OpmlSpeedReader.parse(STDIN).to_yaml
+reader = XML::Reader.io(STDIN)
+puts OpmlSpeedReader.parse(reader).to_yaml
