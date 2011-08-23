@@ -89,7 +89,7 @@ module OpmlSpeedReader
 	end
 	if (OpmlSpeedReader::TRACE.include?(:essential_elements) && !ignore) ||
 	    OpmlSpeedReader::TRACE.include?(:all_elements)
-	  STDERR.puts "HEADER(#{path})"
+	  "HEADER(#{path})"
 	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
@@ -101,7 +101,7 @@ module OpmlSpeedReader
 	end
 	if (OpmlSpeedReader::TRACE.include?(:essential_values) && !ignore) ||
 	    OpmlSpeedReader::TRACE.include?(:all_values)
-	  STDERR.puts "HEADER(#{path}): #{reader.value}"
+	  "HEADER(#{path}): #{reader.value}"
 	end
       when XML::Reader::TYPE_END_ELEMENT
 	stack.pop
@@ -166,11 +166,8 @@ module OpmlSpeedReader
 
     feed_stack = [NamedArray.new(title)]
     OpmlSpeedReader.parse_body(reader, parser_stack) do |feed, depth|
-      STDERR.puts "FEED(#{depth}): #{feed.inspect}."
-      STDERR.puts "STACK: #{feed_stack.inspect}."
       if feed.size > 1
 	raise if ((depth+1) <=> feed_stack.size) == -1
-	STDERR.puts "FEED_STACK[-1]: #{feed_stack[-1].inspect}."
 	feed_stack[-1] << Feed.new(feed[:title], feed[:url])
       else
 	case (depth+1) <=> feed_stack.size
