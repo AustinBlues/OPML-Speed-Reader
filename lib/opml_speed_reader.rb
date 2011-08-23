@@ -5,6 +5,7 @@ require 'opml_speed_reader/version'
 module OpmlSpeedReader
   class NotOPML < StandardError; end
 
+  # Subset of Array with a name too.
   class NamedArray
     attr_reader :name, :array
 
@@ -31,30 +32,6 @@ module OpmlSpeedReader
 
     def ==(other)
       (self.name == other.name) && (self.array == other.array)
-    end
-  end
-
-  class Feed
-    attr_reader :title, :url
-
-    def initialize(title, url)
-      @title, @url = title, url
-    end
-
-    def ==(other)
-      (self.title == other.title) && (self.url == other.url)
-    end
-  end
-
-#  TRACE = [:all_elements]
-  TRACE = []
-
-  # Trace parse - for use by developers; expects block with debug string to print
-  # <tt>element</tt>: type of element
-  def OpmlSpeedReader.trace(element)
-    if OpmlSpeedReader::TRACE.include?(:all_elements) ||
-	OpmlSpeedReader::TRACE.include?(element)
-      STDERR.puts yield
     end
   end
 
@@ -87,10 +64,6 @@ module OpmlSpeedReader
 	else
 	  ignore = true
 	end
-	if (OpmlSpeedReader::TRACE.include?(:essential_elements) && !ignore) ||
-	    OpmlSpeedReader::TRACE.include?(:all_elements)
-	  "HEADER(#{path})"
-	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
 	path = stack.join('/')
@@ -98,10 +71,6 @@ module OpmlSpeedReader
 	case path
 	when 'opml/head/title'
 	  title = reader.value.strip
-	end
-	if (OpmlSpeedReader::TRACE.include?(:essential_values) && !ignore) ||
-	    OpmlSpeedReader::TRACE.include?(:all_values)
-	  "HEADER(#{path}): #{reader.value}"
 	end
       when XML::Reader::TYPE_END_ELEMENT
 	stack.pop
@@ -127,9 +96,6 @@ module OpmlSpeedReader
 	when %r|opml/body(/outline)+|
 	  feed[:title] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
 	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
-	  OpmlSpeedReader.trace(:essential_elements) do
-	    "BEGIN(#{path}): '#{feed[:title]}' '#{feed[:url]}' #{stack.size-3}."
-	  end
 	  yield(feed.dup, stack.size - 3) unless feed.empty?
 	end
 	stack.pop if reader.empty_element?
@@ -167,9 +133,11 @@ module OpmlSpeedReader
     feed_stack = [NamedArray.new(title)]
     OpmlSpeedReader.parse_body(reader, parser_stack) do |feed, depth|
       if feed.size > 1
+	# 'feed' is a :title, :url Hash
 	raise if ((depth+1) <=> feed_stack.size) == -1
-	feed_stack[-1] << Feed.new(feed[:title], feed[:url])
+	feed_stack[-1] << feed
       else
+	# No :url, just a :title, i.e. a Category/folder of feeds.
 	case (depth+1) <=> feed_stack.size
 	when +1
 	  raise

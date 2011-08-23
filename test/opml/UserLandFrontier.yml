@@ -1,12 +1,9 @@
 --- !ruby/object:OpmlSpeedReader::NamedArray 
 array: 
-- !ruby/object:OpmlSpeedReader::Feed 
-  title: Scripting News
-  url: test/opml/ScriptingNews.xml
-- !ruby/object:OpmlSpeedReader::Feed 
-  title: Wired News
-  url: test/opml/WiredNews.xml
-- !ruby/object:OpmlSpeedReader::Feed 
-  title: Boing Boing Blog
-  url: test/opml/BoingBoing.xml
+- :title: Scripting News
+  :url: test/opml/ScriptingNews.xml
+- :title: Wired News
+  :url: test/opml/WiredNews.xml
+- :title: Boing Boing Blog
+  :url: test/opml/BoingBoing.xml
 name: ourFavoriteFeedsData.top100
