@@ -46,18 +46,6 @@ module OpmlSpeedReader
     end
   end
 
-#  TRACE = [:all_elements]
-  TRACE = []
-
-  # Trace parse - for use by developers; expects block with debug string to print
-  # <tt>element</tt>: type of element
-  def OpmlSpeedReader.trace(element)
-    if OpmlSpeedReader::TRACE.include?(:all_elements) ||
-	OpmlSpeedReader::TRACE.include?(element)
-      STDERR.puts yield
-    end
-  end
-
 
   # Parse header of OPML file
   # <tt>reader</tt> - +XML::Reader+ object to read from
@@ -87,10 +75,6 @@ module OpmlSpeedReader
 	else
 	  ignore = true
 	end
-	if (OpmlSpeedReader::TRACE.include?(:essential_elements) && !ignore) ||
-	    OpmlSpeedReader::TRACE.include?(:all_elements)
-	  "HEADER(#{path})"
-	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
 	path = stack.join('/')
@@ -98,10 +82,6 @@ module OpmlSpeedReader
 	case path
 	when 'opml/head/title'
 	  title = reader.value.strip
-	end
-	if (OpmlSpeedReader::TRACE.include?(:essential_values) && !ignore) ||
-	    OpmlSpeedReader::TRACE.include?(:all_values)
-	  "HEADER(#{path}): #{reader.value}"
 	end
       when XML::Reader::TYPE_END_ELEMENT
 	stack.pop
@@ -127,9 +107,6 @@ module OpmlSpeedReader
 	when %r|opml/body(/outline)+|
 	  feed[:title] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
 	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
-	  OpmlSpeedReader.trace(:essential_elements) do
-	    "BEGIN(#{path}): '#{feed[:title]}' '#{feed[:url]}' #{stack.size-3}."
-	  end
 	  yield(feed.dup, stack.size - 3) unless feed.empty?
 	end
 	stack.pop if reader.empty_element?
