@@ -1,24 +1,39 @@
---- 
-- Lars subscriptions in Google Reader
-- - "@Bibliotek"
-  - :title: 24 Ways
-    :url: 24ways.xml
-  - :title: Jeff's Austin Blues
-    :url: austinblues.xml
-  - :title: Christian Century Blogs
-    :url: CCBlog1.xml
-  - :title: "El Pa\xC3\xADs"
-    :url: ElPais.xml
-  - :title: "Geeknet :: Blog"
-    :url: GeekNet.xml
-  - :title: The Guardian World News
-    :url: Guardian.xml
-  - :title: Haaretz.com - News
-    :url: Haaretz.xml
-- - "@Politics"
-  - :title: Jeff Patton's Holistic Product Design & Development
-    :url: JeffPatton.xml
-  - :title: Jon Udell
-    :url: JonsNewRadio.xml
-  - :title: Linux Magazine Full Feed
-    :url: LinuxMag.xml
+--- !ruby/object:OpmlSpeedReader::NamedArray 
+array: 
+- !ruby/object:OpmlSpeedReader::NamedArray 
+  array: 
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: 24 Ways
+    url: 24ways.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: Jeff's Austin Blues
+    url: austinblues.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: Christian Century Blogs
+    url: CCBlog1.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: "El Pa\xC3\xADs"
+    url: ElPais.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: "Geeknet :: Blog"
+    url: GeekNet.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: The Guardian World News
+    url: Guardian.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: Haaretz.com - News
+    url: Haaretz.xml
+  name: "@Bibliotek"
+- !ruby/object:OpmlSpeedReader::NamedArray 
+  array: 
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: Jeff Patton's Holistic Product Design & Development
+    url: JeffPatton.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: Jon Udell
+    url: JonsNewRadio.xml
+  - !ruby/object:OpmlSpeedReader::Feed 
+    title: Linux Magazine Full Feed
+    url: LinuxMag.xml
+  name: "@Politics"
+name: Lars subscriptions in Google Reader

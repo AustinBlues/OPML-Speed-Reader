@@ -5,6 +5,47 @@ require 'opml_speed_reader/version'
 module OpmlSpeedReader
   class NotOPML < StandardError; end
 
+  class NamedArray
+    attr_reader :name, :array
+
+    def initialize(name)
+      @name = name
+      @array = []
+    end
+
+    def [](index)
+      @array[index]
+    end
+
+    def <<(element)
+      @array << element
+    end
+
+    def pop
+      @array.pop
+    end
+
+    def size
+      @array.size
+    end
+
+    def ==(other)
+      (self.name == other.name) && (self.array == other.array)
+    end
+  end
+
+  class Feed
+    attr_reader :title, :url
+
+    def initialize(title, url)
+      @title, @url = title, url
+    end
+
+    def ==(other)
+      (self.title == other.title) && (self.url == other.url)
+    end
+  end
+
 #  TRACE = [:all_elements]
   TRACE = []
 
@@ -13,7 +54,7 @@ module OpmlSpeedReader
   def OpmlSpeedReader.trace(element)
     if OpmlSpeedReader::TRACE.include?(:all_elements) ||
 	OpmlSpeedReader::TRACE.include?(element)
-      puts yield
+      STDERR.puts yield
     end
   end
 
@@ -48,7 +89,7 @@ module OpmlSpeedReader
 	end
 	if (OpmlSpeedReader::TRACE.include?(:essential_elements) && !ignore) ||
 	    OpmlSpeedReader::TRACE.include?(:all_elements)
-	  puts "HEADER(#{path})"
+	  STDERR.puts "HEADER(#{path})"
 	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
@@ -60,7 +101,7 @@ module OpmlSpeedReader
 	end
 	if (OpmlSpeedReader::TRACE.include?(:essential_values) && !ignore) ||
 	    OpmlSpeedReader::TRACE.include?(:all_values)
-	  puts "HEADER(#{path}): #{reader.value}"
+	  STDERR.puts "HEADER(#{path}): #{reader.value}"
 	end
       when XML::Reader::TYPE_END_ELEMENT
 	stack.pop
@@ -123,21 +164,24 @@ module OpmlSpeedReader
 
     parser_stack.pop
 
-    feed_stack = [[title]]
+    feed_stack = [NamedArray.new(title)]
     OpmlSpeedReader.parse_body(reader, parser_stack) do |feed, depth|
+      STDERR.puts "FEED(#{depth}): #{feed.inspect}."
+      STDERR.puts "STACK: #{feed_stack.inspect}."
       if feed.size > 1
-	raise if ((depth+1) <=> (feed_stack.size)) == -1
-	feed_stack[-1] << feed
+	raise if ((depth+1) <=> feed_stack.size) == -1
+	STDERR.puts "FEED_STACK[-1]: #{feed_stack[-1].inspect}."
+	feed_stack[-1] << Feed.new(feed[:title], feed[:url])
       else
-	case depth+1 <=> feed_stack.size
+	case (depth+1) <=> feed_stack.size
 	when +1
 	  raise
 	when 0
-	  feed_stack << [feed[:title]]
+	  feed_stack.push(NamedArray.new(feed[:title]))
 	when -1
 	  tmp = feed_stack.pop
 	  feed_stack[-1] << tmp
-	  feed_stack << [feed[:title]]
+	  feed_stack.push(NamedArray.new(feed[:title]))
 	else
 	  raise
 	end
