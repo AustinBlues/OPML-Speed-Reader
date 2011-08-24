@@ -5,7 +5,7 @@ require 'opml_speed_reader/version'
 module OpmlSpeedReader
   class NotOPML < StandardError; end
 
-  # Subset of Array with a name too.
+  # Superset of Array with a name too.
   class NamedArray
     attr_reader :name, :array
 
@@ -111,19 +111,8 @@ module OpmlSpeedReader
   end
 
 
-  # Is source in reader in OPML format?
-  def self.opml?(reader)
-    parser_stack = []
-    title = OpmlSpeedReader.parse_header(reader, parser_stack)
-  rescue OpmlSpeedReader::NotOPML
-    false
-  else
-    true
-  end
-
-
-  # Parse OPML, reading XML from +io+, returning hash with all RSS
-  # feed relevant data.
+  # Parse OPML, reading XML from +reader+, returning +NamedArray+ with
+  # all RSS feed relevant data.
   def self.parse(reader)
     parser_stack = []
     title = OpmlSpeedReader.parse_header(reader, parser_stack)
@@ -131,7 +120,7 @@ module OpmlSpeedReader
     parser_stack.pop
 
     feed_stack = [NamedArray.new(title)]
-    OpmlSpeedReader.parse_body(reader, parser_stack) do |feed, depth|
+    title = OpmlSpeedReader.parse_all(reader, parser_stack) do |feed, depth|
       if feed.size > 1
 	# 'feed' is a :title, :url Hash
 	raise if ((depth+1) <=> feed_stack.size) == -1

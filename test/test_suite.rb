@@ -18,34 +18,9 @@ class TestOpml < Test::Unit::TestCase
       expected = YAML::load( File.open( filename ) )
       reader = XML::Reader.io(open(filename.gsub(/\.yml\Z/, '.xml')))
       opml = OpmlSpeedReader.parse(reader)
+#      STDERR.puts "EXPECTED: #{expected.to_yaml}."
+#      STDERR.puts "OPML: #{opml.to_yaml}."
       assert (opml == expected)
     end
-  end
-
-
-  # Test exception thrown for non-OPML file (it's an HTML file, a
-  # common user mistake.
-  def test_not_opml
-    reader = XML::Reader.io(open('./test/opml/not_opml.html'))
-    assert_raise OpmlSpeedReader::NotOPML do
-      OpmlSpeedReader.parse(reader)
-    end
-  end
-
-
-  # All OPML file in test fixtures with YAML files are real OPML.
-  def test_opml_detection
-    Dir['./test/opml/*.yml'].each do |filename|
-      reader = XML::Reader.io(open(filename.gsub(/\.yml\Z/, '.xml')))
-      assert (OpmlSpeedReader.opml?(reader))
-    end
-  end
-
-
-  # Test exception thrown for non-OPML file (it's an HTML file, a
-  # common user mistake.
-  def test_not_opml_detection
-    reader = XML::Reader.io(open('./test/opml/not_opml.html'))
-    assert (!OpmlSpeedReader.opml?(reader))
   end
 end
