@@ -3,146 +3,52 @@ require 'opml_speed_reader/version'
 
 
 module OpmlSpeedReader
-  class NotOPML < StandardError; end
-
-  # Superset of Array with a name too.
-  class NamedArray
-    attr_reader :name, :array
-
-    def initialize(name)
-      @name = name
-      @array = []
-    end
-
-    def [](index)
-      @array[index]
-    end
-
-    def <<(element)
-      @array << element
-    end
-
-    def pop
-      @array.pop
-    end
-
-    def size
-      @array.size
-    end
-
-    def ==(other)
-      (self.name == other.name) && (self.array == other.array)
-    end
-  end
-
-
-  # Parse header of OPML file
-  # <tt>reader</tt> - +XML::Reader+ object to read from
-  # <tt>stack</tt> - parse stack, initially empty
-  def OpmlSpeedReader.parse_header(reader, stack)
-    title = nil
-
-    begin
-      status = reader.read
-    rescue LibXML::XML::Error
-      raise NotOPML, 'Not XML'
-    else
-      raise NotOPML, 'Empty file' if !status	# EOF
-    end while reader.node_type == XML::Reader::TYPE_COMMENT
-
-    raise NotOPML, reader.name if reader.node_type == XML::Reader::TYPE_ELEMENT && reader.name != 'opml'
-
-    while status
-      case reader.node_type
-      when XML::Reader::TYPE_ELEMENT
-	stack << reader.name
-	path = stack.join('/')
-	ignore = false
-	case path
-	when 'opml/body'
-	  break		# end of header
-	else
-	  ignore = true
-	end
-	stack.pop if reader.empty_element?
-      when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
-	path = stack.join('/')
-	ignore = false
-	case path
-	when 'opml/head/title'
-	  title = reader.value.strip
-	end
-      when XML::Reader::TYPE_END_ELEMENT
-	stack.pop
-      end
-      status = reader.read
-    end
-    title
-  end
-
-
-
-  # Parse OPML file for RSS/Atom feeds
-  # <tt>reader</tt>: +XML::Reader+ object to read from
-  # <tt>stack</tt>: parse stack from parse_header()
-  def self.parse_body(reader, stack)
-    feed = {}		# force scope
-    begin	# post test loop
-      case reader.node_type
-      when XML::Reader::TYPE_ELEMENT
-	stack << reader.name
-	path = stack.join('/')
-	case path
-	when %r|opml/body(/outline)+|
-	  feed[:title] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
-	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
-	  yield(feed.dup, stack.size - 3) unless feed.empty?
-	end
-	stack.pop if reader.empty_element?
-      when XML::Reader::TYPE_END_ELEMENT
-	path = stack.join('/')
-	case path
-	when %r|opml/body(/outline)+|
-	  feed = {}
-	end
-	stack.pop
-      end
-    end while reader.read
-  end
-
-
-  # Parse OPML, reading XML from +reader+, returning +NamedArray+ with
-  # all RSS feed relevant data.
+  # Parse OPML, reading XML from +reader+, returning hash with all RSS
+  # feed relevant data.
   def self.parse(reader)
-    parser_stack = []
-    title = OpmlSpeedReader.parse_header(reader, parser_stack)
+    title = nil
+    feed_stack = [[]]
+    tag_stack = []
 
-    parser_stack.pop
-
-    feed_stack = [NamedArray.new(title)]
-    title = OpmlSpeedReader.parse_all(reader, parser_stack) do |feed, depth|
-      if feed.size > 1
-	# 'feed' is a :title, :url Hash
-	raise if ((depth+1) <=> feed_stack.size) == -1
-	feed_stack[-1] << feed
-      else
-	# No :url, just a :title, i.e. a Category/folder of feeds.
-	case (depth+1) <=> feed_stack.size
-	when +1
-	  raise
-	when 0
-	  feed_stack.push(NamedArray.new(feed[:title]))
-	when -1
+    tag = nil	# force scope
+    feed = {}
+    
+    while reader.read
+      case reader.node_type
+      when XML::Reader::TYPE_ELEMENT
+	tag = reader.name
+	tag_stack.push(tag)
+	case tag_stack.join('>')
+	when /opml>body(>outline)+/
+	  feed = {:title => reader['text'].strip}
+	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
+	  if feed[:url].nil?	# Category/folder start?
+	    feed_stack.push([feed[:title]])
+	  else
+	    feed_stack[-1] << feed
+	    feed = {}
+	  end
+	  if reader.empty_element?
+	    tag_stack.pop
+	  end
+	end
+      when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
+	case tag_stack.join('>')
+	when 'opml>head>title'
+	  title = reader.value.strip
+	  feed_stack[0].unshift(title)
+	end
+      when XML::Reader::TYPE_END_ELEMENT
+	case tag_stack.join('>')
+	when /opml>body(>outline)+/
 	  tmp = feed_stack.pop
 	  feed_stack[-1] << tmp
-	  feed_stack.push(NamedArray.new(feed[:title]))
-	else
-	  raise
 	end
+	tag_stack.pop
       end
     end
 
-    # Nested feeds (e.g. Google categories) need final flattening.
+    # flatten feed_stack
     while feed_stack.size > 1
       tmp = feed_stack.pop
       feed_stack[-1] << tmp

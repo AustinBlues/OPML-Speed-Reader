@@ -1,7 +1,6 @@
---- !ruby/object:OpmlSpeedReader::NamedArray 
-array: 
-- !ruby/object:OpmlSpeedReader::NamedArray 
-  array: 
+---
+- Lars subscriptions in Google Reader
+- - "@Bibliotek"
   - :title: 24 Ways
     :url: 24ways.xml
   - :title: Jeff's Austin Blues
@@ -16,14 +15,10 @@ array:
     :url: Guardian.xml
   - :title: Haaretz.com - News
     :url: Haaretz.xml
-  name: "@Bibliotek"
-- !ruby/object:OpmlSpeedReader::NamedArray 
-  array: 
+- - "@Politics"
   - :title: Jeff Patton's Holistic Product Design & Development
     :url: JeffPatton.xml
   - :title: Jon Udell
     :url: JonsNewRadio.xml
   - :title: Linux Magazine Full Feed
     :url: LinuxMag.xml
-  name: "@Politics"
-name: Lars subscriptions in Google Reader

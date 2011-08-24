@@ -1,9 +1,8 @@
---- !ruby/object:OpmlSpeedReader::NamedArray 
-array: 
+---
+- ourFavoriteFeedsData.top100
 - :title: Scripting News
   :url: test/opml/ScriptingNews.xml
 - :title: Wired News
   :url: test/opml/WiredNews.xml
 - :title: Boing Boing Blog
   :url: test/opml/BoingBoing.xml
-name: ourFavoriteFeedsData.top100

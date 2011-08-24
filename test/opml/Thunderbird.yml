@@ -1,9 +1,8 @@
---- !ruby/object:OpmlSpeedReader::NamedArray 
-array: 
+---
+- Forumzilla OPML Export
 - :title: Distributing the Future
   :url: test/opml/DistributingTheFuture.xml
 - :title: "Forums: Message List - Developer Tools"
   :url: test/opml/AmazonDeveloperTools.xml
 - :title: The Roadhouse
   :url: test/opml/TheRoadhouse.xml
-name: Forumzilla OPML Export
