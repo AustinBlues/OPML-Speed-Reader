@@ -1,4 +1,5 @@
-require 'xml'
+#require 'xml'
+require 'rexml/parsers/pullparser'
 require 'opml_speed_reader/version'
 
 
@@ -12,35 +13,32 @@ module OpmlSpeedReader
 
     tag = nil	# force scope
     feed = {}
-    
-    while reader.read
-      case reader.node_type
-      when XML::Reader::TYPE_ELEMENT
-	tag = reader.name
+
+    while reader.has_next?
+      event = reader.pull
+      case event.event_type
+      when :start_element
+	tag = event[0]
 	tag_stack.push(tag)
 	case tag_stack.join('>')
-	when /opml>body(>outline)+/
-	  feed = {:title => reader['text'].strip}
-	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
+	when /^opml>body(>outline)+$/
+	  feed = {:title => event[1]['text'].strip}
+	  feed[:url] = event[1]['xmlUrl'].strip if event[1]['xmlUrl']
 	  if feed[:url].nil?	# Category/folder start?
 	    feed_stack.push([feed[:title]])
 	  else
 	    feed_stack[-1] << feed
 	    feed = {}
 	  end
-	  if reader.empty_element?
-	    tag_stack.pop
-	  end
 	end
-      when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
+      when :text, :cdata
 	case tag_stack.join('>')
 	when 'opml>head>title'
-	  title = reader.value.strip
-	  feed_stack[0].unshift(title)
+	  feed_stack[0].unshift(event[0])
 	end
-      when XML::Reader::TYPE_END_ELEMENT
+      when :end_element
 	case tag_stack.join('>')
-	when /opml>body(>outline)+/
+	when 'opml>body>outline'
 	  tmp = feed_stack.pop
 	  feed_stack[-1] << tmp
 	end
