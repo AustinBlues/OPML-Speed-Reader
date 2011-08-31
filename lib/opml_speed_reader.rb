@@ -19,7 +19,7 @@ module OpmlSpeedReader
 	tag = reader.name
 	tag_stack.push(tag)
 	case tag_stack.join('>')
-	when /opml>body(>outline)+/
+	when /^opml>body(>outline)+$/
 	  feed = {:title => reader['text'].strip}
 	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
 	  if feed[:url].nil?	# Category/folder start?
@@ -40,7 +40,7 @@ module OpmlSpeedReader
 	end
       when XML::Reader::TYPE_END_ELEMENT
 	case tag_stack.join('>')
-	when /opml>body(>outline)+/
+	when 'opml>body>outline'
 	  tmp = feed_stack.pop
 	  feed_stack[-1] << tmp
 	end
