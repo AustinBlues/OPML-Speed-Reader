@@ -29,14 +29,6 @@ module OpmlSpeedReader
 	when 'title'
 	  title = reader.value.strip
 	end
-      when XML::Reader::TYPE_END_ELEMENT
-	case tag
-	when 'outline'
-	  if feed[:url]
-	    feeds << feed
-	    feed = {}
-	  end
-	end
       end
     end
 
