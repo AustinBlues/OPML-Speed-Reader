@@ -67,20 +67,16 @@ module OpmlSpeedReader
       case reader.node_type
       when XML::Reader::TYPE_ELEMENT
 	stack << reader.name
-	path = stack.join('/')
-	ignore = false
+	path = stack.join('>')
 	case path
-	when 'opml/body'
+	when 'opml>body'
 	  break		# end of header
-	else
-	  ignore = true
 	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_TEXT, XML::Reader::TYPE_CDATA
-	path = stack.join('/')
-	ignore = false
+	path = stack.join('>')
 	case path
-	when 'opml/head/title'
+	when 'opml>head>title'
 	  title = reader.value.strip
 	end
       when XML::Reader::TYPE_END_ELEMENT
@@ -102,20 +98,16 @@ module OpmlSpeedReader
       case reader.node_type
       when XML::Reader::TYPE_ELEMENT
 	stack << reader.name
-	path = stack.join('/')
+	path = stack.join('>')
 	case path
-	when %r|opml/body(/outline)+|
+	when /^opml>body(>outline)+$/
 	  feed[:title] = (!!reader['title']) ? reader['title'].strip : reader['text'].strip
 	  feed[:url] = reader['xmlUrl'].strip if reader['xmlUrl']
-	  yield(feed.dup, stack.size - 3) unless feed.empty?
+	  yield(feed, stack.size - 3) unless feed.empty?
+	  feed = {}
 	end
 	stack.pop if reader.empty_element?
       when XML::Reader::TYPE_END_ELEMENT
-	path = stack.join('/')
-	case path
-	when %r|opml/body(/outline)+|
-	  feed = {}
-	end
 	stack.pop
       end
     end while reader.read
